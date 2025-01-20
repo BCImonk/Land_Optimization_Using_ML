@@ -1,0 +1,38 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+
+# Load the datasets
+business_data = pd.read_csv("/content/Final Training Dataset.csv")  # Assuming the dataset name is business_data.csv
+age_group_data = pd.read_csv("/content/Age Group .csv")  # Assuming the dataset name is age_group_data.csv
+
+# Prepare the data for training
+X = business_data.iloc[:, :-1]  # Features (excluding the "Business Type" column)
+y = business_data["Business Type"]  # Target variable
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train the model
+model = DecisionTreeClassifier()
+model.fit(X_train, y_train)
+
+# Evaluate the model
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy:", accuracy)
+
+# Ask for user input
+business_capital = float(input("Enter the Business Capital: "))
+district = input("Enter the District: ")
+
+# Get the corresponding row from the age_group_data for the given district
+age_group_row = age_group_data[age_group_data["District"] == district].iloc[:, 1:]  # Exclude the "District" column
+
+# Create the input for prediction
+input_data = pd.DataFrame([[business_capital] + age_group_row.values.tolist()[0]], columns=X.columns)
+
+# Predict the business type
+predicted_business_type = model.predict(input_data)
+print("Predicted Business Type:", predicted_business_type[0])
